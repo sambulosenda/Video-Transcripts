@@ -20,6 +20,7 @@ export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [transcripts, setTranscripts] = useState<any>(null);
   const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
+  const [transcribedText, setTranscribedText] = useState<string>("");
 
   useEffect(() => {
     import("@ffmpeg/ffmpeg").then((FFmpegModule) => {
@@ -99,6 +100,7 @@ export default function Home() {
       const srtContent = convertToSRT(result.text);
       const vttContent = convertToVTT(result.text);
 
+      setTranscribedText(result.text);
       setTranscripts({
         txt: result.text,
         srt: srtContent,
@@ -196,6 +198,9 @@ export default function Home() {
                   <p className="text-sm font-medium text-green-600">
                     Transcription complete!
                   </p>
+                  <div className="bg-gray-100 p-4 rounded-md max-h-40 overflow-y-auto">
+                    <p className="text-sm text-gray-700">{transcribedText}</p>
+                  </div>
                   <div className="grid grid-cols-3 gap-4">
                     {(["txt", "srt", "vtt"] as const).map((format) => (
                       <Button
