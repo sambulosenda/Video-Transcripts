@@ -17,6 +17,7 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [transcripts, setTranscripts] = useState<any>(null);
   const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
 
