@@ -1,16 +1,26 @@
 "use server";
 
-import { createOpenAI } from "@ai-sdk/openai";
+// import { createOpenAI } from "@ai-sdk/openai";
 
-const groq = createOpenAI({
-  baseURL: "https://api.groq.com/openai/v1",
-  apiKey: process.env.GROQ_API_KEY,
-});
+// const groq = createOpenAI({
+//   baseURL: "https://api.groq.com/openai/v1",
+//   apiKey: process.env.GROQ_API_KEY,
+// });
 
-export async function transcribe(formData: FormData) {
+interface TranscriptionResult {
+  text: string;
+  segments?: Array<{
+    text: string;
+    start: number;
+    end: number;
+  }>;
+}
+
+export async function transcribe(
+  formData: FormData
+): Promise<TranscriptionResult> {
   try {
     const file = formData.get("file") as File;
-
     if (!file) {
       throw new Error("No file provided");
     }
@@ -34,7 +44,15 @@ export async function transcribe(formData: FormData) {
     }
 
     const result = await response.json();
-    return result;
+
+    if (typeof result.text !== "string") {
+      throw new Error("Unexpected response format: missing 'text' field");
+    }
+
+    return {
+      text: result.text,
+      segments: Array.isArray(result.segments) ? result.segments : undefined,
+    };
   } catch (error) {
     console.error("Error in transcribe action:", error);
     throw error;
