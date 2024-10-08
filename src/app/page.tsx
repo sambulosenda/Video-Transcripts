@@ -6,19 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { AlertCircle, Upload, Download, RefreshCw } from "lucide-react";
 import { transcribe } from "@/app/actions/transcribe";
-import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
+import {
+  convertToSRT,
+  convertToVTT,
+  TranscriptionSegment,
+} from "@/utils/transcriptionFormats";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let FFmpeg: any;
+
+interface Transcripts {
+  txt: string;
+  srt: string;
+  vtt: string;
+}
 
 export default function Home() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [transcripts, setTranscripts] = useState<any>(null);
+  const [transcripts, setTranscripts] = useState<Transcripts | null>(null);
   const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
   const [transcribedText, setTranscribedText] = useState<string>("");
 
@@ -32,7 +41,7 @@ export default function Home() {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 2500 * 1024 * 1024) {
+      if (file.size > 25 * 1024 * 1024) {
         setError("File size exceeds 25MB limit. Please choose a smaller file.");
         return;
       }
@@ -97,12 +106,19 @@ export default function Home() {
 
       setProgress(75);
 
-      const srtContent = convertToSRT(result.text);
-      const vttContent = convertToVTT(result.text);
+      const transcribedText = result.text;
+      const segments = result.segments || [];
 
-      setTranscribedText(result.text);
+      const srtContent = convertToSRT(
+        segments.length > 0 ? segments : transcribedText
+      );
+      const vttContent = convertToVTT(
+        segments.length > 0 ? segments : transcribedText
+      );
+
+      setTranscribedText(transcribedText);
       setTranscripts({
-        txt: result.text,
+        txt: transcribedText,
         srt: srtContent,
         vtt: vttContent,
       });
@@ -115,7 +131,7 @@ export default function Home() {
     }
   };
 
-  const downloadTranscript = (format: "txt" | "srt" | "vtt") => {
+  const downloadTranscript = (format: keyof Transcripts) => {
     if (!transcripts) return;
 
     const content = transcripts[format];
