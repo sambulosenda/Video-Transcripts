@@ -4,13 +4,16 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { AlertCircle, Upload, Download, RefreshCw } from "lucide-react";
-import { transcribe } from "@/app/actions/transcribe";
 import {
-  convertToSRT,
-  convertToVTT,
-  TranscriptionSegment,
-} from "@/utils/transcriptionFormats";
+  AlertCircle,
+  Upload,
+  Download,
+  RefreshCw,
+  Copy,
+  Check,
+} from "lucide-react";
+import { transcribe } from "@/app/actions/transcribe";
+import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,6 +33,7 @@ export default function Home() {
   const [transcripts, setTranscripts] = useState<Transcripts | null>(null);
   const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
   const [transcribedText, setTranscribedText] = useState<string>("");
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     import("@ffmpeg/ffmpeg").then((FFmpegModule) => {
@@ -153,6 +157,18 @@ export default function Home() {
     setProgress(0);
   };
 
+  const copyTranscribedText = async () => {
+    if (transcribedText) {
+      try {
+        await navigator.clipboard.writeText(transcribedText);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000); // Reset copied state after 2 seconds
+      } catch (err) {
+        console.error("Failed to copy text: ", err);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl shadow-lg">
@@ -214,8 +230,22 @@ export default function Home() {
                   <p className="text-sm font-medium text-green-600">
                     Transcription complete!
                   </p>
-                  <div className="bg-gray-100 p-4 rounded-md max-h-40 overflow-y-auto">
-                    <p className="text-sm text-gray-700">{transcribedText}</p>
+                  <div className="bg-gray-100 p-4 rounded-md h-40 relative">
+                    <div className="overflow-y-auto h-full pr-8">
+                      <p className="text-sm text-gray-700">{transcribedText}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={copyTranscribedText}
+                    >
+                      {isCopied ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     {(["txt", "srt", "vtt"] as const).map((format) => (
