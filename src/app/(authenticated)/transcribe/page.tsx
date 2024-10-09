@@ -10,10 +10,6 @@ import {
   Copy,
   Check,
   LogOut,
-  Home,
-  FileText,
-  Settings,
-  CreditCard,
   Menu,
   X,
 } from "lucide-react";
@@ -190,49 +186,13 @@ export default function DashboardPage() {
         </Button>
       </header>
 
-      {/* Sidebar */}
-      <div
-        className={`bg-indigo-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 transition duration-200 ease-in-out md:flex md:flex-col z-20`}
-      >
-        <nav>
-          <ul className="space-y-2">
-            <li>
-              <Button variant="ghost" className="w-full justify-start">
-                <Home className="mr-2 h-4 w-4" />
-                Dashboard
-              </Button>
-            </li>
-            <li>
-              <Button variant="ghost" className="w-full justify-start">
-                <FileText className="mr-2 h-4 w-4" />
-                Transcriptions
-              </Button>
-            </li>
-            <li>
-              <Button variant="ghost" className="w-full justify-start">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-            </li>
-            <li>
-              <Button variant="ghost" className="w-full justify-start">
-                <CreditCard className="mr-2 h-4 w-4" />
-                Billing
-              </Button>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col bg-gray-50">
         {/* Desktop Header */}
         <header className="bg-white shadow-sm p-4 hidden md:block">
           <div className="flex justify-between items-center max-w-7xl mx-auto">
             <h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 flex-end">
               <UserButton afterSignOutUrl="/" />
               <SignOutButton>
                 <Button variant="outline" size="sm">
