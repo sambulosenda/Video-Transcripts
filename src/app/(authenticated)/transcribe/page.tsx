@@ -32,7 +32,6 @@ export default function DashboardPage() {
   const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
   const [transcribedText, setTranscribedText] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     import("@ffmpeg/ffmpeg").then((FFmpegModule) => {
