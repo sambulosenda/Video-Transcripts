@@ -25,7 +25,7 @@ export default function LandingPage() {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <span className="text-xl sm:text-2xl font-bold text-indigo-600">
-                Go Transcribe
+                Go Transcrib
               </span>
             </div>
             {/* Desktop menu */}
