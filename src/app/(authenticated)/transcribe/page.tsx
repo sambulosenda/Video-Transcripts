@@ -9,18 +9,10 @@ import {
   RefreshCw,
   Copy,
   Check,
-  LogOut,
-  Home,
-  FileText,
-  Settings,
-  CreditCard,
-  Menu,
-  X,
 } from "lucide-react";
 import { transcribe } from "@/app/actions/transcribe";
 import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
-import { UserButton, SignOutButton } from "@clerk/nextjs";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let FFmpeg: any;
@@ -40,7 +32,6 @@ export default function DashboardPage() {
   const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
   const [transcribedText, setTranscribedText] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     import("@ffmpeg/ffmpeg").then((FFmpegModule) => {
@@ -178,72 +169,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col md:flex-row">
-      {/* Mobile Header */}
-      <header className="bg-indigo-800 text-white p-4 flex justify-between items-center md:hidden">
-        <h1 className="text-xl font-bold">Go Transcribe</h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          {isSidebarOpen ? <X /> : <Menu />}
-        </Button>
-      </header>
-
-      {/* Sidebar */}
-      <div
-        className={`bg-indigo-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 transition duration-200 ease-in-out md:flex md:flex-col z-20`}
-      >
-        <nav>
-          <ul className="space-y-2">
-            <li>
-              <Button variant="ghost" className="w-full justify-start">
-                <Home className="mr-2 h-4 w-4" />
-                Dashboard
-              </Button>
-            </li>
-            <li>
-              <Button variant="ghost" className="w-full justify-start">
-                <FileText className="mr-2 h-4 w-4" />
-                Transcriptions
-              </Button>
-            </li>
-            <li>
-              <Button variant="ghost" className="w-full justify-start">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-            </li>
-            <li>
-              <Button variant="ghost" className="w-full justify-start">
-                <CreditCard className="mr-2 h-4 w-4" />
-                Billing
-              </Button>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col bg-gray-50">
-        {/* Desktop Header */}
-        <header className="bg-white shadow-sm p-4 hidden md:block">
-          <div className="flex justify-between items-center max-w-7xl mx-auto">
-            <h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
-            <div className="flex items-center space-x-4">
-              <UserButton afterSignOutUrl="/" />
-              <SignOutButton>
-                <Button variant="outline" size="sm">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </Button>
-              </SignOutButton>
-            </div>
-          </div>
-        </header>
-
         {/* Dashboard Content */}
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-5xl mx-auto">
