@@ -1,289 +1,180 @@
-"use client";
+'use client'
 
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import { SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
-  AlertCircle,
-  Upload,
-  Download,
-  RefreshCw,
-  Copy,
-  Check,
+  ArrowRight,
+  Video,
+  FileText,
+  Clock,
+  Globe,
+  Menu,
+  X,
 } from "lucide-react";
-import { transcribe } from "@/app/actions/transcribe";
-import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
-import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import Link from "next/link";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let FFmpeg: any;
-
-interface Transcripts {
-  txt: string;
-  srt: string;
-  vtt: string;
-}
-
-export default function Home() {
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [transcripts, setTranscripts] = useState<Transcripts | null>(null);
-  const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
-  const [transcribedText, setTranscribedText] = useState<string>("");
-  const [isCopied, setIsCopied] = useState(false);
-
-  useEffect(() => {
-    import("@ffmpeg/ffmpeg").then((FFmpegModule) => {
-      FFmpeg = FFmpegModule.FFmpeg;
-      setFFmpegLoaded(true);
-    });
-  }, []);
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 25 * 1024 * 1024) {
-        setError("File size exceeds 25MB limit. Please choose a smaller file.");
-        return;
-      }
-      setVideoFile(file);
-      setError(null);
-      setTranscripts(null);
-    }
-  };
-
-  const processVideo = async () => {
-    if (!videoFile || !FFmpeg || !ffmpegLoaded) return;
-
-    setIsProcessing(true);
-    setProgress(0);
-    setError(null);
-
-    try {
-      const ffmpeg = new FFmpeg();
-      const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.2/dist/umd";
-      await ffmpeg.load({
-        coreURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.js`,
-          "text/javascript"
-        ),
-        wasmURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.wasm`,
-          "application/wasm"
-        ),
-      });
-
-      setProgress(10);
-
-      await ffmpeg.writeFile("input.mp4", await fetchFile(videoFile));
-
-      setProgress(20);
-
-      await ffmpeg.exec([
-        "-i",
-        "input.mp4",
-        "-vn",
-        "-acodec",
-        "pcm_s16le",
-        "-ar",
-        "16000",
-        "-ac",
-        "1",
-        "output.wav",
-      ]);
-
-      setProgress(40);
-
-      const data = await ffmpeg.readFile("output.wav");
-      const audioBlob = new Blob([data], { type: "audio/wav" });
-
-      const formData = new FormData();
-      formData.append("file", audioBlob, "audio.wav");
-      formData.append("model", "whisper-large-v3");
-
-      setProgress(50);
-
-      const result = await transcribe(formData);
-
-      setProgress(75);
-
-      const transcribedText = result.text;
-      const segments = result.segments || [];
-
-      const srtContent = convertToSRT(
-        segments.length > 0 ? segments : transcribedText
-      );
-      const vttContent = convertToVTT(
-        segments.length > 0 ? segments : transcribedText
-      );
-
-      setTranscribedText(transcribedText);
-      setTranscripts({
-        txt: transcribedText,
-        srt: srtContent,
-        vtt: vttContent,
-      });
-      setProgress(100);
-    } catch (err) {
-      console.error(err);
-      setError("An error occurred during processing. Please try again.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const downloadTranscript = (format: keyof Transcripts) => {
-    if (!transcripts) return;
-
-    const content = transcripts[format];
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `transcript.${format}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const resetApp = () => {
-    setVideoFile(null);
-    setTranscripts(null);
-    setError(null);
-    setProgress(0);
-  };
-
-  const copyTranscribedText = async () => {
-    if (transcribedText) {
-      try {
-        await navigator.clipboard.writeText(transcribedText);
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000); // Reset copied state after 2 seconds
-      } catch (err) {
-        console.error("Failed to copy text: ", err);
-      }
-    }
-  };
+export default function LandingPage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Video Transcription for Content Creators
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {!videoFile ? (
-            <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:bg-gray-50 transition duration-300"
-              onClick={() => document.getElementById("file-input")?.click()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith("video/")) {
-                  handleFileUpload({ target: { files: [file] } } as any);
-                } else {
-                  setError("Please upload a valid video file.");
-                }
-              }}
-            >
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-600">
-                Drag and drop your video file here, or click to browse
-              </p>
-              <p className="mt-1 text-xs text-gray-500">
-                MP4, MOV, or AVI up to 25MB
-              </p>
-              <input
-                id="file-input"
-                type="file"
-                className="hidden"
-                accept="video/*"
-                onChange={handleFileUpload}
-              />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <span className="text-xl sm:text-2xl font-bold text-indigo-600">
+                Go Transcrib
+              </span>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-sm font-medium text-gray-700">
-                Selected file: {videoFile.name}
-              </p>
-              {isProcessing ? (
-                <div className="space-y-2">
-                  <Progress value={progress} className="w-full" />
-                  <p className="text-sm text-gray-600 text-center">
-                    {progress}% -
-                    {progress < 40
-                      ? "Extracting audio..."
-                      : progress < 75
-                      ? "Transcribing your video..."
-                      : "Generating transcript files..."}
-                  </p>
-                </div>
-              ) : transcripts ? (
-                <div className="space-y-4">
-                  <p className="text-sm font-medium text-green-600">
-                    Transcription complete!
-                  </p>
-                  <div className="bg-gray-100 p-4 rounded-md h-40 relative">
-                    <div className="overflow-y-auto h-full pr-8">
-                      <p className="text-sm text-gray-700">{transcribedText}</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2"
-                      onClick={copyTranscribedText}
-                    >
-                      {isCopied ? (
-                        <Check className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    {(["txt", "srt", "vtt"] as const).map((format) => (
-                      <Button
-                        key={format}
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => downloadTranscript(format)}
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Download {format.toUpperCase()}
-                      </Button>
-                    ))}
-                  </div>
-                  <Button onClick={resetApp} className="w-full mt-4">
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Process Another Video
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  onClick={processVideo}
-                  className="w-full"
-                  disabled={!ffmpegLoaded}
-                >
-                  {ffmpegLoaded ? "Start Transcription" : "Loading FFmpeg..."}
+            {/* Desktop menu */}
+            <div className="hidden sm:flex items-center space-x-4">
+              <Link href="/sign-up">
+                <Button className="bg-indigo-600 hover:bg-indigo-700">
+                  Sign Up
                 </Button>
-              )}
+              </Link>
+              <Link href="/sign-in">
+                <Button className="bg-indigo-600 hover:bg-indigo-700">
+                  Log In
+                </Button>
+              </Link>
             </div>
-          )}
-          {error && (
-            <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded flex items-center">
-              <AlertCircle className="mr-2 h-4 w-4" />
-              <p className="text-sm">{error}</p>
+            {/* Mobile menu button */}
+            <div className="sm:hidden flex items-center">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              >
+                <span className="sr-only">Open main menu</span>
+                {isMenuOpen ? (
+                  <X className="block h-6 w-6" aria-hidden="true" />
+                ) : (
+                  <Menu className="block h-6 w-6" aria-hidden="true" />
+                )}
+              </button>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+        {/* Mobile menu, show/hide based on menu state */}
+        <div className={`sm:hidden ${isMenuOpen ? "block" : "hidden"}`}>
+          <div className="px-2 pt-2 pb-3 space-y-2">
+            {" "}
+            {/* Changed space-y-1 to space-y-2 */}
+            <Link href="/sign-up" className="block w-full">
+              <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
+                Sign Up
+              </Button>
+            </Link>
+            <Link href="/sign-in" className="block w-full">
+              <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
+                Log In
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="pt-10 pb-12 px-4 sm:px-6 text-center sm:pt-16 sm:pb-20 lg:pt-32">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight font-extrabold text-gray-900">
+          <span className="block">Convert any video format</span>
+          <span className="block text-indigo-600">to Text in minutes!</span>
+        </h1>
+        <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+          Have a video recording that you need to convert into text? Go
+          Transcribe provides an automated way to transcribe{" "}
+          <strong>Video to text</strong> with results back in minutes.
+        </p>
+        <div className="mt-5 max-w-md mx-auto">
+          <Button className="w-full flex items-center justify-center px-6 py-3 text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 sm:px-8 sm:py-3 md:py-4 md:text-lg md:px-10">
+            Get Started
+            <ArrowRight className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="py-12 bg-white px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">
+              Features
+            </h2>
+            <p className="mt-2 text-2xl sm:text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              Why Choose Go Transcribe?
+            </p>
+          </div>
+
+          <div className="mt-10">
+            <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
+              {[
+                {
+                  icon: Video,
+                  title: "Multiple Video Formats",
+                  description:
+                    "Support for various video formats ensuring compatibility with your content.",
+                },
+                {
+                  icon: Clock,
+                  title: "Fast Turnaround",
+                  description:
+                    "Get your transcriptions back in minutes, not hours or days.",
+                },
+                {
+                  icon: FileText,
+                  title: "Accurate Transcriptions",
+                  description:
+                    "High-quality transcriptions powered by advanced AI technology.",
+                },
+                {
+                  icon: Globe,
+                  title: "Multi-language Support",
+                  description:
+                    "Transcribe videos in multiple languages to reach a global audience.",
+                },
+              ].map((feature, index) => (
+                <div key={index} className="relative">
+                  <dt>
+                    <div className="absolute flex items-center justify-center h-10 w-10 rounded-md bg-indigo-500 text-white sm:h-12 sm:w-12">
+                      <feature.icon
+                        className="h-5 w-5 sm:h-6 sm:w-6"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <p className="ml-14 sm:ml-16 text-base sm:text-lg leading-6 font-medium text-gray-900">
+                      {feature.title}
+                    </p>
+                  </dt>
+                  <dd className="mt-2 ml-14 sm:ml-16 text-sm sm:text-base text-gray-500">
+                    {feature.description}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-indigo-700">
+        <div className="max-w-2xl mx-auto text-center py-12 px-4 sm:py-16 sm:px-6 lg:py-20 lg:px-8">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white sm:text-4xl">
+            <span className="block">Ready to start transcribing?</span>
+            <span className="block">Sign up for Go Transcribe today.</span>
+          </h2>
+          <p className="mt-4 text-base sm:text-lg leading-6 text-indigo-200">
+            Join thousands of users who trust Go Transcribe for their
+            video-to-text needs.
+          </p>
+          <SignUpButton mode="modal">
+            <Button className="mt-8 w-full sm:w-auto px-5 py-3 text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50">
+              Get started for free
+            </Button>
+          </SignUpButton>
+        </div>
+      </div>
     </div>
   );
 }
