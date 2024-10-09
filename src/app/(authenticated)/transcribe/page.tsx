@@ -9,14 +9,10 @@ import {
   RefreshCw,
   Copy,
   Check,
-  LogOut,
-  Menu,
-  X,
 } from "lucide-react";
 import { transcribe } from "@/app/actions/transcribe";
 import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
-import { UserButton, SignOutButton } from "@clerk/nextjs";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let FFmpeg: any;
@@ -174,36 +170,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col md:flex-row">
-      {/* Mobile Header */}
-      <header className="bg-indigo-800 text-white p-4 flex justify-between items-center md:hidden">
-        <h1 className="text-xl font-bold">Go Transcribe</h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          {isSidebarOpen ? <X /> : <Menu />}
-        </Button>
-      </header>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col bg-gray-50">
-        {/* Desktop Header */}
-        <header className="bg-white shadow-sm p-4 hidden md:block">
-          <div className="flex justify-between items-center max-w-7xl mx-auto">
-            <h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
-            <div className="flex items-center space-x-4 flex-end">
-              <UserButton afterSignOutUrl="/" />
-              <SignOutButton>
-                <Button variant="outline" size="sm">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </Button>
-              </SignOutButton>
-            </div>
-          </div>
-        </header>
-
         {/* Dashboard Content */}
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-5xl mx-auto">
