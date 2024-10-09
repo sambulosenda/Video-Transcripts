@@ -17,7 +17,7 @@ import {
 import { transcribe } from "@/app/actions/transcribe";
 import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
-import { UserButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { UserButton, SignOutButton } from "@clerk/nextjs";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,6 @@ interface Transcripts {
 }
 
 export default function Page() {
-  const { user } = useUser();
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -192,10 +191,6 @@ export default function Page() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
               <DropdownMenuItem>
                 <SignOutButton>
                   <div className="flex items-center">
