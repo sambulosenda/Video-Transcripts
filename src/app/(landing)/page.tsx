@@ -237,7 +237,7 @@ export default function LandingPage() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto px-6 py-6 text-lg font-semibold text-blue-600 bg-white hover:bg-blue-50 rounded-full transition-colors duration-300"
+                    className="w-full sm:w-auto px-6 py-6 text-lg font-semibold text-blue-600 bg-white  border-white hover:bg-blue-50 border-2 rounded-full transition-colors duration-300"
                   >
                     Start Transcribing Now
                     <ArrowRight
