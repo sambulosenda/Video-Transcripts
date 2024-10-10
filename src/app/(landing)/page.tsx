@@ -331,7 +331,7 @@ export default function LandingPage() {
                     Ready to start transcribing?
                   </h2>
                   <p className="text-xl text-gray-600">
-                    Join thousands of users who trust Go Transcribe for their
+                    Join thousands of users who trust Audioscriber for their
                     video-to-text needs. Experience the power of AI-driven
                     transcription today.
                   </p>
@@ -438,7 +438,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
             <p>
-              &copy; {new Date().getFullYear()} Go Transcribe. All rights
+              &copy; {new Date().getFullYear()} Audioscriber. All rights
               reserved.
             </p>
           </div>
