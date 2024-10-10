@@ -168,16 +168,12 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col md:flex-row">
+    <div>
       {/* Main Content */}
-      <div className="flex-1 flex flex-col bg-gray-50">
+      <div className="flex-1 flex flex-col">
         {/* Dashboard Content */}
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-5xl mx-auto">
-            <h1 className="text-3xl font-bold mb-8 text-gray-900">
-              Video Transcription
-            </h1>
-
             <div className="bg-white shadow-md rounded-lg p-8">
               {!videoFile ? (
                 <div
@@ -203,6 +199,13 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-500">
                     MP4, MOV, or AVI up to 25MB
                   </p>
+                  <div className="flex justify-center mt-10">
+                    <Button className="text-white font-semibold py-3 px-6 rounded-full transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700">
+                      <RefreshCw className="mr-2 h-5 w-5" />
+                      Select file
+                    </Button>
+                  </div>
+
                   <input
                     id="file-input"
                     type="file"
@@ -213,11 +216,14 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-sm font-medium text-gray-700">
-                    Selected file: {videoFile.name}
+                  <p className="text-md font-medium text-gray-700">
+                    {videoFile.name}
                   </p>
                   {isProcessing ? (
                     <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+                      <p className="text-md font-medium text-gray-700">
+                        {videoFile.name}
+                      </p>
                       <h2 className="text-xl font-semibold text-gray-800 mb-4">
                         Transcription Progress
                       </h2>
@@ -253,57 +259,57 @@ export default function DashboardPage() {
                     </div>
                   ) : transcripts ? (
                     <div className="space-y-4">
-                      <div className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
-                        <div className="p-3 border-b border-gray-200 flex justify-between items-center">
-                          <h2 className="text-lg font-semibold text-gray-800">
+                      <div className="bg-white p-6 mb-6">
+                        <div className="flex justify-between items-center mb-4">
+                          <h2 className="text-xl font-semibold text-gray-800">
                             Transcription Result
                           </h2>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
                             onClick={copyTranscribedText}
                             className="text-gray-600 hover:text-gray-800"
                           >
                             {isCopied ? (
-                              <Check className="h-4 w-4 mr-2 text-green-500" />
+                              <Check className="h-5 w-5 text-green-500" />
                             ) : (
-                              <Copy className="h-4 w-4 mr-2" />
+                              <Copy className="h-5 w-5" />
                             )}
-                            {isCopied ? "Copied!" : "Copy"}
                           </Button>
                         </div>
-                        <div className="p-3 max-h-60 overflow-y-auto">
-                          <p className="text-sm text-gray-700 leading-relaxed">
+                        <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-y-auto">
+                          <p className="text-gray-700 leading-relaxed">
                             {transcribedText}
                           </p>
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {(["txt", "srt", "vtt"] as const).map((format) => (
-                          <Button
-                            key={format}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => downloadTranscript(format)}
-                            className="text-gray-600 hover:text-gray-800"
-                          >
-                            <Download className="mr-1 h-4 w-4" />
-                            Download {format.toUpperCase()}
-                          </Button>
-                        ))}
+                      <div className="space-y-6">
+                        <div className="flex flex-wrap gap-4 justify-center">
+                          {(["txt", "vtt", "srt"] as const).map((format) => (
+                            <Button
+                              key={format}
+                              onClick={() => downloadTranscript(format)}
+                              className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 ease-in-out flex items-center"
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              {format.toUpperCase()}
+                            </Button>
+                          ))}
+                        </div>
+
+                        <Button
+                          onClick={resetApp}
+                          className="w-full text-white font-semibold py-3 px-6 rounded-full transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700"
+                        >
+                          <RefreshCw className="mr-2 h-5 w-5" />
+                          New Transcription
+                        </Button>
                       </div>
-                      <Button
-                        onClick={resetApp}
-                        className="w-full bg-black text-white hover:bg-gray-800"
-                      >
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Process Another Video
-                      </Button>
                     </div>
                   ) : (
                     <Button
                       onClick={processVideo}
-                      className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
+                      className="w-full text-white font-semibold py-3 px-6 rounded-full transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700"
                       disabled={!ffmpegLoaded}
                     >
                       {ffmpegLoaded
