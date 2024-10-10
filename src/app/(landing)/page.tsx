@@ -4,7 +4,6 @@ import { SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Play,
-  Type,
   ArrowRight,
   Video,
   FileText,
@@ -23,7 +22,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 
 export default function LandingPage() {
@@ -96,7 +94,7 @@ export default function LandingPage() {
                 />
               </div>
               <span className="text-xl font-semibold text-gray-900">
-                AudioScriber
+                Audioscriber
               </span>
             </Link>
 
@@ -106,7 +104,7 @@ export default function LandingPage() {
                   <NavigationMenuItem key={item.href}>
                     {item.subItems ? (
                       <>
-                        <NavigationMenuTrigger>
+                        <NavigationMenuTrigger className="text-base font-medium">
                           {item.label}
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
@@ -129,13 +127,14 @@ export default function LandingPage() {
                         </NavigationMenuContent>
                       </>
                     ) : (
-                      <Link href={item.href} legacyBehavior passHref>
-                        <NavigationMenuLink
-                          className={navigationMenuTriggerStyle()}
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href={item.href}
+                          className="text-base font-medium px-4 py-2 hover:text-accent-foreground transition-colors"
                         >
                           {item.label}
-                        </NavigationMenuLink>
-                      </Link>
+                        </Link>
+                      </NavigationMenuLink>
                     )}
                   </NavigationMenuItem>
                 ))}
@@ -145,12 +144,12 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center space-x-4">
               <Link
                 href="/sign-in"
-                className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                className="text-base font-medium text-gray-700 hover:text-indigo-600 transition-colors"
               >
                 Log In
               </Link>
               <Link href="/sign-up" passHref>
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition-colors">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition-colors text-base">
                   Get Started
                 </Button>
               </Link>
@@ -173,7 +172,7 @@ export default function LandingPage() {
                     <div key={item.href}>
                       <Link
                         href={item.href}
-                        className="text-lg font-medium text-gray-900 hover:text-indigo-600 transition-colors"
+                        className="text-xl font-medium text-gray-900 hover:text-indigo-600 transition-colors"
                         onClick={() => setIsOpen(false)}
                       >
                         {item.label}
@@ -184,7 +183,7 @@ export default function LandingPage() {
                             <li key={subItem.href}>
                               <Link
                                 href={subItem.href}
-                                className="text-sm text-gray-600 hover:text-indigo-600 transition-colors"
+                                className="text-base text-gray-600 hover:text-indigo-600 transition-colors"
                                 onClick={() => setIsOpen(false)}
                               >
                                 {subItem.label}
@@ -197,7 +196,7 @@ export default function LandingPage() {
                   ))}
                   <Link
                     href="/sign-in"
-                    className="text-lg font-medium text-gray-900 hover:text-indigo-600 transition-colors"
+                    className="text-xl font-medium text-gray-900 hover:text-indigo-600 transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     Log In
@@ -207,7 +206,7 @@ export default function LandingPage() {
                     passHref
                     onClick={() => setIsOpen(false)}
                   >
-                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors">
+                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors text-base">
                       Get Started
                     </Button>
                   </Link>
@@ -236,7 +235,10 @@ export default function LandingPage() {
                   cutting-edge AI platform.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button className="px-8 py-6 text-lg font-semibold text-blue-900 bg-white rounded-full hover:bg-blue-50 transition-colors duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                  <Button
+                    size="lg"
+                    className="px-8 py-6 text-lg font-semibold text-blue-600 bg-white border-2 border-white rounded-full hover:bg-blue-600 hover:text-white transition-colors duration-300"
+                  >
                     Start Transcribing Now
                     <ArrowRight
                       className="ml-2 -mr-1 h-5 w-5 inline"
@@ -280,19 +282,6 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              {[
-                { icon: Type, text: "99% Accuracy" },
-                { icon: ArrowRight, text: "Fast Turnaround" },
-                { icon: Play, text: "Multiple Formats" },
-                { icon: Type, text: "100+ Languages" },
-              ].map((feature, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <feature.icon className="h-8 w-8 mb-4" aria-hidden="true" />
-                  <p className="font-semibold">{feature.text}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 
@@ -303,7 +292,7 @@ export default function LandingPage() {
                 Features
               </h2>
               <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl text-gray-900">
-                Why Choose AudioScriber?
+                Why Choose Audioscriber?
               </h3>
               <p className="max-w-2xl mx-auto text-xl text-gray-600">
                 Experience the power of AI-driven transcription with our
@@ -395,9 +384,17 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Go Transcribe</h3>
+              <h3 className="text-lg font-semibold mb-4">Audioscriber</h3>
+
               <p className="text-gray-400">
-                Transforming video content into text, faster than ever.
+                Audioscriber leverages cutting-edge AI technology to provide
+                accurate, efficient, and affordable video transcription
+                services. Whether you're a content creator, journalist, or
+                business professional, our platform streamlines your workflow,
+                making it easier to create subtitles, generate searchable
+                content, and improve accessibility. With support for multiple
+                languages and formats, Audioscriber is your go-to solution for
+                all your transcription needs.
               </p>
             </div>
             <div>
