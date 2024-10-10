@@ -38,7 +38,6 @@ export default function LandingPage() {
       ],
     },
     { label: "Pricing", href: "/pricing" },
-    { label: "Resources", href: "/resources" },
   ];
 
   const benefits = [
@@ -98,48 +97,6 @@ export default function LandingPage() {
               </span>
             </Link>
 
-            <NavigationMenu className="hidden md:flex">
-              <NavigationMenuList>
-                {navItems.map((item) => (
-                  <NavigationMenuItem key={item.href}>
-                    {item.subItems ? (
-                      <>
-                        <NavigationMenuTrigger className="text-base font-medium">
-                          {item.label}
-                        </NavigationMenuTrigger>
-                        <NavigationMenuContent>
-                          <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                            {item.subItems.map((subItem) => (
-                              <li key={subItem.href}>
-                                <NavigationMenuLink asChild>
-                                  <Link
-                                    href={subItem.href}
-                                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                                  >
-                                    <div className="text-sm font-medium leading-none">
-                                      {subItem.label}
-                                    </div>
-                                  </Link>
-                                </NavigationMenuLink>
-                              </li>
-                            ))}
-                          </ul>
-                        </NavigationMenuContent>
-                      </>
-                    ) : (
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href={item.href}
-                          className="text-base font-medium px-4 py-2 hover:text-accent-foreground transition-colors"
-                        >
-                          {item.label}
-                        </Link>
-                      </NavigationMenuLink>
-                    )}
-                  </NavigationMenuItem>
-                ))}
-              </NavigationMenuList>
-            </NavigationMenu>
 
             <div className="hidden md:flex items-center space-x-4">
               <Link
@@ -168,32 +125,7 @@ export default function LandingPage() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                 <nav className="flex flex-col space-y-4 mt-6">
-                  {navItems.map((item) => (
-                    <div key={item.href}>
-                      <Link
-                        href={item.href}
-                        className="text-xl font-medium text-gray-900 hover:text-indigo-600 transition-colors"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {item.label}
-                      </Link>
-                      {item.subItems && (
-                        <ul className="ml-4 mt-2 space-y-2">
-                          {item.subItems.map((subItem) => (
-                            <li key={subItem.href}>
-                              <Link
-                                href={subItem.href}
-                                className="text-base text-gray-600 hover:text-indigo-600 transition-colors"
-                                onClick={() => setIsOpen(false)}
-                              >
-                                {subItem.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
+                 
                   <Link
                     href="/sign-in"
                     className="text-xl font-medium text-gray-900 hover:text-indigo-600 transition-colors"
