@@ -389,7 +389,7 @@ export default function LandingPage() {
               <p className="text-gray-400">
                 Audioscriber leverages cutting-edge AI technology to provide
                 accurate, efficient, and affordable video transcription
-                services. Whether you're a content creator, journalist, or
+                services. Whether youre a content creator, journalist, or
                 business professional, our platform streamlines your workflow,
                 making it easier to create subtitles, generate searchable
                 content, and improve accessibility. With support for multiple
