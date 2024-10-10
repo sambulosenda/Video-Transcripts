@@ -5,7 +5,7 @@ const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 export default clerkMiddleware((auth, request) => {
   if (request.nextUrl.pathname === "/") {
     if (auth().userId) {
-      return Response.redirect(new URL("/transcribe", request.url));
+      return Response.redirect(new URL("/dashboard", request.url));
     }
   } else if (!isPublicRoute(request)) {
     auth().protect();

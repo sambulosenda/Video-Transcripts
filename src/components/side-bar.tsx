@@ -8,7 +8,7 @@ const routes = [
   {
     label: "Dashboard",
     icon: Home,
-    href: "/transcribe",
+    href: "/dashboard",
   },
   {
     label: "Transcriptions",
