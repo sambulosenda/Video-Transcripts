@@ -15,30 +15,9 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 
 export default function LandingPage() {
   const [isOpen, setIsOpen] = useState(false);
-
-  const navItems = [
-    {
-      label: "Features",
-      href: "/features",
-      subItems: [
-        { label: "Transcription", href: "/features/transcription" },
-        { label: "Translation", href: "/features/translation" },
-        { label: "Subtitles", href: "/features/subtitles" },
-      ],
-    },
-    { label: "Pricing", href: "/pricing" },
-  ];
 
   const benefits = [
     "Free trial with no credit card required",
@@ -97,7 +76,6 @@ export default function LandingPage() {
               </span>
             </Link>
 
-
             <div className="hidden md:flex items-center space-x-4">
               <Link
                 href="/sign-in"
@@ -125,7 +103,6 @@ export default function LandingPage() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                 <nav className="flex flex-col space-y-4 mt-6">
-                 
                   <Link
                     href="/sign-in"
                     className="text-xl font-medium text-gray-900 hover:text-indigo-600 transition-colors"
