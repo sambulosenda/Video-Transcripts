@@ -147,14 +147,20 @@ export default function DashboardPage() {
   };
 
   const downloadTranscript = (format: keyof Transcripts) => {
-    if (!transcripts) return;
+    if (!transcripts || !file) return;
 
     const content = transcripts[format];
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `transcript.${format}`;
+
+    // Generate the file name based on the original file name
+    const originalFileName = file.name.split(".").slice(0, -1).join("."); // Remove the extension
+    const downloadFileName = `${originalFileName}_transcript.${format}`;
+
+    a.download = downloadFileName; // Use the generated file name
+
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
