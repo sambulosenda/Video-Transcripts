@@ -7,6 +7,7 @@ import {
   Upload,
   Download,
   RefreshCw,
+  Zap,
   Copy,
   Check,
   File,
@@ -16,6 +17,7 @@ import { transcribe } from "@/app/actions/transcribe";
 import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useUser } from "@clerk/nextjs";
+import { motion } from "framer-motion";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let FFmpeg: any;
@@ -291,27 +293,38 @@ export default function DashboardPage() {
       </div>
     );
   }
-
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col bg-gray-50">
       <main className="flex-1 overflow-y-auto p-6">
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white shadow-md rounded-lg p-8">
-            <h1 className="text-2xl font-bold mb-4">
-              Welcome, {user?.firstName}!
-            </h1>
-            <p className="text-md mb-6">
-              Transcriptions remaining: {3 - trialUsage}
-            </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white shadow-md rounded-lg p-8"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold text-gray-800">
+                Welcome, {user?.firstName}!
+              </h1>
+              <div className="flex items-center space-x-2 bg-indigo-50 rounded-full px-4 py-2">
+                <Zap className="h-5 w-5 text-indigo-500" />
+                <p className="text-sm font-medium text-indigo-700">
+                  Transcriptions left:{" "}
+                  <span className="font-bold">{3 - trialUsage}</span>
+                </p>
+              </div>
+            </div>
             {!file ? (
-              <div
+              <motion.div
+                whileHover={{ scale: 1.02 }}
                 className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:bg-gray-50 transition duration-300"
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
               >
                 <Upload className="mx-auto h-20 w-20 text-gray-400 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-2">
                   Drag and drop your video or audio file here
                 </h3>
                 <p className="text-sm text-gray-500 mb-4">
@@ -327,54 +340,69 @@ export default function DashboardPage() {
                   accept="video/*,audio/*"
                   onChange={handleFileUpload}
                 />
-              </div>
+              </motion.div>
             ) : (
               <div className="space-y-6">
                 <FileSelection
                   fileSize={file.size}
                   onRemove={() => setFile(null)}
                 />
-                <Button
-                  onClick={processFile}
-                  className="w-full text-white font-semibold py-3 px-6 rounded-full transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700"
-                  disabled={!ffmpegLoaded || isProcessing}
-                >
-                  {isProcessing ? (
-                    <>
-                      <RefreshCw className="animate-spin mr-2 h-5 w-5" />
-                      Processing...
-                    </>
-                  ) : ffmpegLoaded ? (
-                    "Start Transcription"
-                  ) : (
-                    "Loading FFmpeg..."
-                  )}
-                </Button>
+                {file && !transcripts && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                  >
+                    <Button
+                      onClick={processFile}
+                      className="w-full text-white font-semibold py-4 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 shadow-md"
+                      disabled={!ffmpegLoaded || isProcessing}
+                    >
+                      {isProcessing ? (
+                        <>
+                          <RefreshCw className="animate-spin mr-2 h-5 w-5" />
+                          Processing...
+                        </>
+                      ) : ffmpegLoaded ? (
+                        "Start Transcription"
+                      ) : (
+                        "Loading FFmpeg..."
+                      )}
+                    </Button>
+                  </motion.div>
+                )}
               </div>
             )}
             {isProcessing && (
-              <div className="mt-6 bg-white shadow-md rounded-lg p-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mt-6 bg-white shadow-md rounded-lg p-6 border border-gray-200"
+              >
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">
                   Transcription Progress
                 </h2>
                 <div className="relative pt-1">
                   <div className="flex mb-2 items-center justify-between">
                     <div>
-                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-teal-600 bg-teal-200">
+                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-100">
                         {progress < 100 ? "In Progress" : "Complete"}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs font-semibold inline-block text-teal-600">
+                      <span className="text-xs font-semibold inline-block text-indigo-600">
                         {progress}%
                       </span>
                     </div>
                   </div>
-                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-teal-200">
-                    <div
-                      style={{ width: `${progress}%` }}
-                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-teal-500 transition-all duration-500 ease-in-out"
-                    ></div>
+                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.5 }}
+                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500"
+                    ></motion.div>
                   </div>
                   <p className="text-sm text-gray-600 text-center">
                     {progress < 40
@@ -386,20 +414,25 @@ export default function DashboardPage() {
                       : "Transcription complete!"}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             )}
             {transcripts && (
-              <div className="mt-6 space-y-6">
-                <div className="bg-gray-50 rounded-lg p-6 shadow-inner">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mt-6 space-y-6"
+              >
+                <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-gray-800">
+                    <h2 className="text-2xl font-semibold text-gray-800">
                       Transcription Result
                     </h2>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={copyTranscribedText}
-                      className="text-gray-600 hover:bg-gray-100"
+                      className="text-indigo-600 hover:bg-indigo-50 border-indigo-300"
                     >
                       {isCopied ? (
                         <Check className="h-5 w-5 text-green-500" />
@@ -408,7 +441,7 @@ export default function DashboardPage() {
                       )}
                     </Button>
                   </div>
-                  <div className="bg-white rounded-lg p-4 max-h-60 overflow-y-auto shadow-sm">
+                  <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-y-auto shadow-inner">
                     <p className="text-gray-700 leading-relaxed">
                       {transcribedText}
                     </p>
@@ -417,33 +450,48 @@ export default function DashboardPage() {
                 <div className="space-y-6">
                   <div className="flex flex-wrap gap-4 justify-center">
                     {(["txt", "vtt", "srt"] as const).map((format) => (
-                      <Button
+                      <motion.div
                         key={format}
-                        onClick={() => downloadTranscript(format)}
-                        className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 ease-in-out flex items-center"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                       >
-                        <Download className="mr-2 h-4 w-4" />
-                        {format.toUpperCase()}
-                      </Button>
+                        <Button
+                          onClick={() => downloadTranscript(format)}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out flex items-center shadow-sm"
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          {format.toUpperCase()}
+                        </Button>
+                      </motion.div>
                     ))}
                   </div>
-                  <Button
-                    onClick={resetApp}
-                    className="w-full text-white font-semibold py-3 px-6 rounded-full transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700"
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <RefreshCw className="mr-2 h-5 w-5" />
-                    New Transcription
-                  </Button>
+                    <Button
+                      onClick={resetApp}
+                      className="w-full text-white font-semibold py-4 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 shadow-md"
+                    >
+                      <RefreshCw className="mr-2 h-5 w-5" />
+                      New Transcription
+                    </Button>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             )}
             {error && (
-              <div className="mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center"
+              >
                 <AlertCircle className="mr-3 h-5 w-5 flex-shrink-0" />
                 <p className="text-sm flex-grow">{error}</p>
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         </div>
       </main>
     </div>
