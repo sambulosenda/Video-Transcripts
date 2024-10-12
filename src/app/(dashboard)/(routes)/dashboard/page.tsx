@@ -294,15 +294,10 @@ export default function DashboardPage() {
     );
   }
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
+    <div className="flex-1 flex flex-col bg-gray-10">
       <main className="flex-1 overflow-y-auto p-6">
         <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-white shadow-md rounded-lg p-8"
-          >
+      
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold text-gray-800">
                 Welcome, {user?.firstName}!
@@ -491,7 +486,6 @@ export default function DashboardPage() {
                 <p className="text-sm flex-grow">{error}</p>
               </motion.div>
             )}
-          </motion.div>
         </div>
       </main>
     </div>
