@@ -194,7 +194,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
         <div className="container px-4 md:px-6 py-8 mx-auto">
-          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-gray-600 dark:text-gray-300">
+          <div className=" border-gray-200 dark:border-gray-700 text-center text-gray-600 dark:text-gray-300">
             <p>&copy; 2024 TranscribeAI. All rights reserved.</p>
           </div>
         </div>
