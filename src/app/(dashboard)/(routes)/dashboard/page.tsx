@@ -43,12 +43,12 @@ const FileSelection: React.FC<FileSelectionProps> = ({
   return (
     <div className="bg-white rounded-lg p-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center">
-        <File className="h-10 w-10 text-purple-500 mr-3" />
+        <File className="h-10 w-10 text-orange-400 mr-3" />
         <div>
           <h3 className="text-sm font-semibold text-gray-700">File selected</h3>
           <div className="mt-1 w-48 bg-gray-200 rounded-full h-1.5">
             <div
-              className="bg-purple-500 h-1.5 rounded-full"
+              className="bg-orange-500 h-1.5 rounded-full"
               style={{ width: `${sizePercentage}%` }}
             ></div>
           </div>
@@ -68,7 +68,7 @@ const FileSelection: React.FC<FileSelectionProps> = ({
 };
 
 export default function DashboardPage() {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -288,7 +288,7 @@ export default function DashboardPage() {
             Your trial has expired. Please upgrade to continue using the
             service.
           </p>
-          <Button className="bg-blue-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300">
+          <Button className="bg-blue-600 hover:bg-orange-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300">
             Upgrade Now
           </Button>
         </div>
@@ -303,11 +303,9 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center">
               <Sun className="h-8 w-8 text-orange-400 mr-3" />
-              <h1 className="text-3xl font-bold text-gray-800">
-                Good evening
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-800">Good evening</h1>
             </div>
-            <div className="bg-purple-100 rounded-full px-3 py-1 text-sm font-medium text-purple-700">
+            <div className="bg-purple-100 rounded-full px-3 py-1 text-sm font-medium text-orange-700">
               Professional Plan
             </div>
           </div>
@@ -355,7 +353,7 @@ export default function DashboardPage() {
                 {file && !transcripts && (
                   <Button
                     onClick={processFile}
-                    className="w-full text-white font-semibold py-3 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-purple-500 hover:bg-blue-600 shadow-sm"
+                    className="w-full text-white font-semibold py-3 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-black hover:bg-gray-800 shadow-sm"
                     disabled={!ffmpegLoaded || isProcessing}
                   >
                     {isProcessing ? (
@@ -386,12 +384,12 @@ export default function DashboardPage() {
               <div className="relative pt-1">
                 <div className="flex mb-2 items-center justify-between">
                   <div>
-                    <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-purple-600 bg-purple-100">
+                    <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-orange-600 bg-purple-100">
                       {progress < 100 ? "In Progress" : "Complete"}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-semibold inline-block text-purple-600">
+                    <span className="text-xs font-semibold inline-block text-orange-600">
                       {progress}%
                     </span>
                   </div>
@@ -401,7 +399,7 @@ export default function DashboardPage() {
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
                     transition={{ duration: 0.5 }}
-                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-500"
+                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-orange-500"
                   ></motion.div>
                 </div>
                 <p className="text-sm text-gray-600 text-center">
@@ -432,7 +430,7 @@ export default function DashboardPage() {
                     variant="outline"
                     size="sm"
                     onClick={copyTranscribedText}
-                    className="text-blue-600 hover:bg-purple-50 border-purple-300"
+                    className="text-black hover:bg-gray-100 border-gray-300"
                   >
                     {isCopied ? (
                       <Check className="h-5 w-5 text-green-500" />
@@ -457,7 +455,7 @@ export default function DashboardPage() {
                     >
                       <Button
                         onClick={() => downloadTranscript(format)}
-                        className="bg-blue-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out flex items-center shadow-sm"
+                        className="bg-white hover:bg-gray-100 text-black font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out flex items-center shadow-sm border border-gray-300"
                       >
                         <Download className="mr-2 h-4 w-4" />
                         {format.toUpperCase()}
@@ -471,7 +469,7 @@ export default function DashboardPage() {
                 >
                   <Button
                     onClick={resetApp}
-                    className="w-full text-white font-semibold py-4 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-blue-600 hover:bg-purple-700 shadow-md"
+                    className="w-full text-white font-semibold py-4 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-black hover:bg-gray-800 shadow-md"
                   >
                     <RefreshCw className="mr-2 h-5 w-5" />
                     New Transcription
