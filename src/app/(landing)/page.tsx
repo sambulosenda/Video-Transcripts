@@ -1,358 +1,326 @@
 "use client";
-import React, { useState } from "react";
-import { SignUpButton } from "@clerk/nextjs";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Play,
-  ArrowRight,
-  Video,
-  FileText,
-  Clock,
-  Globe,
-  Menu,
-  Check,
-} from "lucide-react";
-import Link from "next/link";
+import { Mic, FileText, Clock, Lock, Zap, Layers, Menu, X } from "lucide-react";
 import Image from "next/image";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Link from "next/link";
+import { useTheme } from "next-themes";
 
 export default function LandingPage() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  const benefits = [
-    "Free trial with no credit card required",
-    "Accurate transcriptions in minutes",
-    "Support for multiple languages",
-    "Easy-to-use interface",
-  ];
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const features = [
-    {
-      icon: Video,
-      title: "Multiple Video Formats",
-      description:
-        "Support for various video formats ensuring compatibility with your content.",
-    },
-    {
-      icon: Clock,
-      title: "Fast Turnaround",
-      description:
-        "Get your transcriptions back in minutes, not hours or days.",
-    },
-    {
-      icon: FileText,
-      title: "Accurate Transcriptions",
-      description:
-        "High-quality transcriptions powered by advanced AI technology.",
-    },
-    {
-      icon: Globe,
-      title: "Multi-language Support",
-      description:
-        "Transcribe videos in multiple languages to reach a global audience.",
-    },
-  ];
+  if (!mounted) {
+    return null;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="bg-white border-b border-gray-200 fixed w-full z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link
-              href="/"
-              className="flex items-center space-x-2 transition-transform hover:scale-105"
-            >
-              <div className="relative w-8 h-8">
-                <Image
-                  src="/logo-blue.png"
-                  alt="AudioScriber"
-                  layout="fill"
-                  objectFit="contain"
-                  className="rounded-full"
-                />
-              </div>
-              <span className="text-xl font-semibold text-gray-900">
-                Audioscriber
-              </span>
-            </Link>
-
-            <div className="hidden md:flex items-center space-x-4">
-              <Link
-                href="/sign-in"
-                className="text-base font-medium text-gray-700 hover:text-indigo-600 transition-colors"
-              >
-                Log In
-              </Link>
-              <Link href="/sign-up" passHref>
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition-colors text-base">
-                  Get Started
-                </Button>
-              </Link>
-            </div>
-
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  aria-label="Open main menu"
-                >
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col space-y-4 mt-6">
-                  <Link
-                    href="/sign-in"
-                    className="text-xl font-medium text-gray-900 hover:text-indigo-600 transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Log In
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    passHref
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors text-base">
-                      Get Started
-                    </Button>
-                  </Link>
-                </nav>
-              </SheetContent>
-            </Sheet>
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <header className="px-4 lg:px-6 h-16 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+        <Link
+          href="/"
+          className="flex items-center space-x-2 transition-transform hover:scale-105"
+        >
+          <div className="relative w-8 h-8">
+            <Image
+              src="/logo-blue.png"
+              alt="AudioScriber"
+              layout="fill"
+              objectFit="contain"
+              className="rounded-full"
+            />
           </div>
+          <span className="text-xl font-semibold text-gray-900">
+            Audioscriber
+          </span>
+        </Link>
+        <nav className="hidden md:flex gap-4 sm:gap-6">
+          <Button
+            variant="outline"
+            className="border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            Log in
+          </Button>
+        </nav>
+        <div className="flex md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X /> : <Menu />}
+          </Button>
         </div>
       </header>
 
-      <main className="pt-16">
-        <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white overflow-hidden">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div className="text-left space-y-6 md:space-y-8">
-                <div>
-                  <h2 className="inline-block px-3 py-1 rounded-full bg-blue-500 bg-opacity-50 text-xs sm:text-sm font-semibold tracking-wide uppercase mb-4">
-                    AI-Powered Transcription
-                  </h2>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-                    Convert Video to Text in Minutes
-                  </h1>
-                </div>
-                <p className="text-lg sm:text-xl md:text-2xl text-blue-100">
-                  Transcribe your videos quickly and accurately with our
-                  cutting-edge AI platform.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button
-                    size="lg"
-                    className="w-full sm:w-auto px-6 py-6 text-lg font-semibold text-blue-600 bg-white  border-white hover:bg-blue-50 border-2 rounded-full transition-colors duration-300"
-                  >
-                    Start Transcribing Now
-                    <ArrowRight
-                      className="ml-2 -mr-1 h-5 w-5 inline"
-                      aria-hidden="true"
-                    />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="hidden sm:inline-flex px-6 py-6 text-lg font-semibold text-white bg-blue-600 bg-opacity-50 border-2 border-white rounded-full transition-colors duration-300 ease-in-out"
-                    size="lg"
-                  >
-                    Watch Demo
-                    <Play
-                      className="ml-2 -mr-1 h-5 w-5 inline"
-                      aria-hidden="true"
-                    />
-                  </Button>
-                </div>
-                <p className="text-sm sm:text-base text-white font-medium bg-blue-500 bg-opacity-50 px-4 py-2 rounded-full inline-block">
-                  No credit card required | Free trial available
-                </p>
-              </div>
-              <div className="relative mt-12 md:mt-0">
-                <div className="absolute inset-0 bg-blue-500 bg-opacity-50 backdrop-blur-md rounded-2xl transform rotate-3"></div>
-                <div className="relative bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
-                  <div className="aspect-w-16 aspect-h-9">
-                    <Image
-                      src="/transcript.png"
-                      alt="Video transcription preview"
-                      width={1280}
-                      height={720}
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Play
-                        className="h-12 w-12 sm:h-16 sm:w-16 text-white opacity-75"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  </div>
-                </div>
+      {isMenuOpen && (
+        <div className="md:hidden bg-white dark:bg-gray-900 p-4">
+          <nav className="flex flex-col gap-4">
+            <Link
+              className="text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              href="#features"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Features
+            </Link>
+            <Link
+              className="text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              href="#pricing"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Pricing
+            </Link>
+            <Button
+              variant="outline"
+              className="border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Log in
+            </Button>
+          </nav>
+        </div>
+      )}
+
+      <main className="flex-1">
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 text-center">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="flex flex-col items-center space-y-4">
+              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none max-w-3xl mx-auto">
+                Transform Your Audio & Video with AI-Powered Transcription
+              </h1>
+              <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
+                Accurate, fast, and effortless transcription for creators,
+                businesses, and researchers.
+              </p>
+              <div className="space-x-4">
+                <Button className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
+                  Start Transcribing
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  Watch Demo
+                </Button>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="bg-gray-50 py-20">
-          <div className="max-w-7xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <div className="text-center space-y-4 mb-16">
-              <h2 className="text-sm font-semibold tracking-wide uppercase text-indigo-600">
-                Features
-              </h2>
-              <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl text-gray-900">
-                Why Choose Audioscriber?
-              </h3>
-              <p className="max-w-2xl mx-auto text-xl text-gray-600">
-                Experience the power of AI-driven transcription with our
-                cutting-edge features.
-              </p>
-            </div>
-            <div className="grid mx-auto gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {features.map((feature, index) => (
+        <section className="w-full py-16 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+          <div className="container px-4 md:px-6 mx-auto text-center">
+            <h2 className="text-2xl font-semibold mb-4">
+              Powerful Transcription Features
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+              {[
+                {
+                  icon: Mic,
+                  title: "Advanced Speech Recognition",
+                  description:
+                    "State-of-the-art AI for unparalleled accuracy across accents and languages",
+                },
+                {
+                  icon: FileText,
+                  title: "Multi-Format Support",
+                  description:
+                    "Transcribe audio and video in various formats, from MP3 to MP4 and beyond",
+                },
+                {
+                  icon: Clock,
+                  title: "Lightning-Fast Results",
+                  description:
+                    "Get your transcripts in minutes, not hours, without compromising on quality",
+                },
+                {
+                  icon: Lock,
+                  title: "Bank-Grade Security",
+                  description:
+                    "Your files and transcripts are encrypted and protected at all times",
+                },
+                {
+                  icon: Zap,
+                  title: "Automated Timestamps",
+                  description:
+                    "Easy navigation with precise timestamps for every section of your transcript",
+                },
+                {
+                  icon: Layers,
+                  title: "Custom Vocabulary",
+                  description:
+                    "Teach our AI your industry-specific terms for even greater accuracy",
+                },
+              ].map((feature, index) => (
                 <div
                   key={index}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-colors duration-300 hover:border-indigo-300 group"
+                  className="flex flex-col items-center text-center max-w-sm"
                 >
-                  <div className="p-6">
-                    <div className="flex flex-col items-center text-center space-y-4">
-                      <div className="p-3 rounded-full bg-indigo-100 text-indigo-600 group-hover:bg-indigo-200 transition-colors duration-300">
-                        <feature.icon className="w-6 h-6" aria-hidden="true" />
-                      </div>
-                      <h4 className="text-xl font-semibold text-gray-900">
-                        {feature.title}
-                      </h4>
-                      <p className="text-gray-600">{feature.description}</p>
-                    </div>
-                  </div>
+                  <feature.icon className="h-12 w-12 mb-4 text-black dark:text-white" />
+                  <h3 className="text-xl font-semibold mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {feature.description}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-24 bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-10 lg:grid-cols-2 items-center">
-              <div className="space-y-8 text-left">
-                <div className="space-y-4">
-                  <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl text-gray-900">
-                    Ready to start transcribing?
-                  </h2>
-                  <p className="text-xl text-gray-600">
-                    Join thousands of users who trust Audioscriber for their
-                    video-to-text needs. Experience the power of AI-driven
-                    transcription today.
-                  </p>
-                </div>
-                <ul className="space-y-3">
-                  {benefits.map((benefit, index) => (
-                    <li key={index} className="flex items-center space-x-3">
-                      <Check
-                        className="h-5 w-5 text-indigo-500 flex-shrink-0"
-                        aria-hidden="true"
-                      />
-                      <span className="text-gray-700">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-                <SignUpButton mode="modal">
-                  <Button className="inline-flex items-center justify-center rounded-md text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-indigo-600 text-white hover:bg-indigo-700 h-12 px-8 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                    Get started for free
-                    <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
-                  </Button>
-                </SignUpButton>
-              </div>
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-                <div className="relative p-8 bg-white ring-1 ring-gray-900/5 rounded-lg leading-none flex flex-col items-start justify-start space-y-6 shadow-2xl">
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-slate-800">
-                      Get started in seconds
-                    </h3>
-                    <p className="text-slate-600">
-                      Our intuitive interface makes it easy to upload your video
-                      and get accurate transcriptions quickly.
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="mt-4 group-hover:bg-indigo-50 transition-colors"
-                  >
-                    Learn More
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
+        <section className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="flex flex-col items-center space-y-4 text-center">
+              <h2 className="text-3xl font-bold">Start Transcribing Today</h2>
+              <p className="max-w-[600px] text-gray-600 dark:text-gray-300">
+                Join thousands of professionals using TranscribeAI to save time
+                and unlock the potential of their audio and video content.
+              </p>
+              <div className="w-full max-w-sm space-y-2">
+                <Button className="w-full bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
+                  Sign up for free
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  View pricing
+                </Button>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="bg-gray-800 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <footer className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <div className="container px-4 md:px-6 py-8 mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 justify-items-center">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Audioscriber</h3>
-
-              <p className="text-gray-400">
-                Audioscriber leverages cutting-edge AI technology to provide
-                accurate, efficient, and affordable video transcription
-                services. Whether youre a content creator, journalist, or
-                business professional, our platform streamlines your workflow,
-                making it easier to create subtitles, generate searchable
-                content, and improve accessibility. With support for multiple
-                languages and formats, Audioscriber is your go-to solution for
-                all your transcription needs.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+              <h3 className="font-semibold mb-3">Product</h3>
               <ul className="space-y-2">
-                {[
-                  { href: "/features", text: "Features" },
-                  { href: "/pricing", text: "Pricing" },
-                  { href: "/about", text: "About Us" },
-                  { href: "/contact", text: "Contact" },
-                ].map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-gray-400 hover:text-white transition-colors"
-                    >
-                      {link.text}
-                    </Link>
-                  </li>
-                ))}
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    API
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Legal</h3>
+              <h3 className="font-semibold mb-3">Company</h3>
               <ul className="space-y-2">
-                {[
-                  { href: "/privacy", text: "Privacy Policy" },
-                  { href: "/terms", text: "Terms of Service" },
-                ].map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-gray-400 hover:text-white transition-colors"
-                    >
-                      {link.text}
-                    </Link>
-                  </li>
-                ))}
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    About us
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Careers
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Contact
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-3">Resources</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Help Center
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Community
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-3">Legal</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-gray-600  dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  >
+                    Terms of Service
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
-            <p>
-              &copy; {new Date().getFullYear()} Audioscriber. All rights
-              reserved.
-            </p>
+          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-gray-600 dark:text-gray-300">
+            <p>&copy; 2024 TranscribeAI. All rights reserved.</p>
           </div>
         </div>
       </footer>
+      <Button
+        className="fixed bottom-4 right-4 bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      >
+        {theme === "dark" ? "Light Mode" : "Dark Mode"}
+      </Button>
     </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   Check,
   File,
   X,
+  Sun,
 } from "lucide-react";
 import { transcribe } from "@/app/actions/transcribe";
 import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
@@ -32,27 +33,26 @@ interface FileSelectionProps {
   fileSize: number;
   onRemove: () => void;
 }
-
 const FileSelection: React.FC<FileSelectionProps> = ({
   fileSize,
   onRemove,
 }) => {
-  const maxSize = 25 * 1024 * 1024; // 25MB in bytes
+  const maxSize = 25 * 1024 * 1024;
   const sizePercentage = (fileSize / maxSize) * 100;
 
   return (
-    <div className="bg-gray-50 rounded-lg p-6 flex items-center justify-between">
+    <div className="bg-white rounded-lg p-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center">
-        <File className="h-16 w-16 text-indigo-500 mr-4" />
+        <File className="h-10 w-10 text-purple-500 mr-3" />
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">File selected</h3>
-          <div className="mt-2 w-48 bg-gray-200 rounded-full h-2.5">
+          <h3 className="text-sm font-semibold text-gray-700">File selected</h3>
+          <div className="mt-1 w-48 bg-gray-200 rounded-full h-1.5">
             <div
-              className="bg-indigo-600 h-2.5 rounded-full"
+              className="bg-purple-500 h-1.5 rounded-full"
               style={{ width: `${sizePercentage}%` }}
             ></div>
           </div>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             {(fileSize / (1024 * 1024)).toFixed(2)} MB / 25 MB
           </p>
         </div>
@@ -61,7 +61,7 @@ const FileSelection: React.FC<FileSelectionProps> = ({
         onClick={onRemove}
         className="text-gray-400 hover:text-gray-600 transition-colors"
       >
-        <X className="h-6 w-6" />
+        <X className="h-5 w-5" />
       </button>
     </div>
   );
@@ -279,50 +279,60 @@ export default function DashboardPage() {
 
   if (!hasActiveTrial) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center p-8 bg-white rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Trial Expired</h2>
-          <p className="mb-4">
+      <div className="flex-1 flex items-center justify-center bg-gray-50">
+        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">
+            Trial Expired
+          </h2>
+          <p className="mb-6 text-gray-600">
             Your trial has expired. Please upgrade to continue using the
             service.
           </p>
-          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Button className="bg-blue-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300">
             Upgrade Now
           </Button>
         </div>
       </div>
     );
   }
+
   return (
-    <div className="flex-1 flex flex-col bg-gray-10">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <main className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-5xl mx-auto">
-      
-            <div className="flex justify-between items-center mb-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center">
+              <Sun className="h-8 w-8 text-orange-400 mr-3" />
               <h1 className="text-3xl font-bold text-gray-800">
-                Welcome, {user?.firstName}!
+                Good evening
               </h1>
-              <div className="flex items-center space-x-2 bg-indigo-50 rounded-full px-4 py-2">
-                <Zap className="h-5 w-5 text-indigo-500" />
-                <p className="text-sm font-medium text-indigo-700">
-                  Transcriptions left:{" "}
-                  <span className="font-bold">{3 - trialUsage}</span>
-                </p>
-              </div>
             </div>
+            <div className="bg-purple-100 rounded-full px-3 py-1 text-sm font-medium text-purple-700">
+              Professional Plan
+            </div>
+          </div>
+          {/* Add this line to display trial usage */}
+          {hasActiveTrial ? (
+            <p className="text-sm text-gray-600 mb-4 mf-4">
+              You have {trialUsage} transcripts left
+            </p>
+          ) : null}
+
+          {/* ... rest of the component ... */}
+          <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
             {!file ? (
               <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:bg-gray-50 transition duration-300"
+                whileHover={{ scale: 1.01 }}
+                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition duration-300"
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
               >
-                <Upload className="mx-auto h-20 w-20 text-gray-400 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-700 mb-2">
+                <Upload className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">
                   Drag and drop your video or audio file here
                 </h3>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-gray-500 mb-2">
                   or click to browse your device
                 </p>
                 <p className="text-xs text-gray-400">
@@ -337,155 +347,150 @@ export default function DashboardPage() {
                 />
               </motion.div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <FileSelection
                   fileSize={file.size}
                   onRemove={() => setFile(null)}
                 />
                 {file && !transcripts && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.5 }}
+                  <Button
+                    onClick={processFile}
+                    className="w-full text-white font-semibold py-3 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-purple-500 hover:bg-blue-600 shadow-sm"
+                    disabled={!ffmpegLoaded || isProcessing}
                   >
-                    <Button
-                      onClick={processFile}
-                      className="w-full text-white font-semibold py-4 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 shadow-md"
-                      disabled={!ffmpegLoaded || isProcessing}
-                    >
-                      {isProcessing ? (
-                        <>
-                          <RefreshCw className="animate-spin mr-2 h-5 w-5" />
-                          Processing...
-                        </>
-                      ) : ffmpegLoaded ? (
-                        "Start Transcription"
-                      ) : (
-                        "Loading FFmpeg..."
-                      )}
-                    </Button>
-                  </motion.div>
+                    {isProcessing ? (
+                      <>
+                        <RefreshCw className="animate-spin mr-2 h-5 w-5" />
+                        Processing...
+                      </>
+                    ) : ffmpegLoaded ? (
+                      "Start Transcription"
+                    ) : (
+                      "Loading FFmpeg..."
+                    )}
+                  </Button>
                 )}
               </div>
             )}
-            {isProcessing && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mt-6 bg-white shadow-md rounded-lg p-6 border border-gray-200"
-              >
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                  Transcription Progress
-                </h2>
-                <div className="relative pt-1">
-                  <div className="flex mb-2 items-center justify-between">
-                    <div>
-                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-100">
-                        {progress < 100 ? "In Progress" : "Complete"}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs font-semibold inline-block text-indigo-600">
-                        {progress}%
-                      </span>
-                    </div>
+          </div>
+          {isProcessing && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mt-8 bg-white shadow-lg rounded-lg p-6 border border-gray-200"
+            >
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Transcription Progress
+              </h2>
+              <div className="relative pt-1">
+                <div className="flex mb-2 items-center justify-between">
+                  <div>
+                    <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-purple-600 bg-purple-100">
+                      {progress < 100 ? "In Progress" : "Complete"}
+                    </span>
                   </div>
-                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progress}%` }}
-                      transition={{ duration: 0.5 }}
-                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500"
-                    ></motion.div>
+                  <div className="text-right">
+                    <span className="text-xs font-semibold inline-block text-purple-600">
+                      {progress}%
+                    </span>
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
-                    {progress < 40
-                      ? "Extracting audio..."
-                      : progress < 75
-                      ? "Transcribing your file..."
-                      : progress < 100
-                      ? "Generating transcript files..."
-                      : "Transcription complete!"}
+                </div>
+                <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.5 }}
+                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-500"
+                  ></motion.div>
+                </div>
+                <p className="text-sm text-gray-600 text-center">
+                  {progress < 40
+                    ? "Extracting audio..."
+                    : progress < 75
+                    ? "Transcribing your file..."
+                    : progress < 100
+                    ? "Generating transcript files..."
+                    : "Transcription complete!"}
+                </p>
+              </div>
+            </motion.div>
+          )}
+          {transcripts && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mt-8 space-y-8"
+            >
+              <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-200">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-semibold text-gray-800">
+                    Transcription Result
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyTranscribedText}
+                    className="text-blue-600 hover:bg-purple-50 border-purple-300"
+                  >
+                    {isCopied ? (
+                      <Check className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <Copy className="h-5 w-5" />
+                    )}
+                  </Button>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-y-auto shadow-inner">
+                  <p className="text-gray-700 leading-relaxed">
+                    {transcribedText}
                   </p>
                 </div>
-              </motion.div>
-            )}
-            {transcripts && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mt-6 space-y-6"
-              >
-                <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-semibold text-gray-800">
-                      Transcription Result
-                    </h2>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={copyTranscribedText}
-                      className="text-indigo-600 hover:bg-indigo-50 border-indigo-300"
+              </div>
+              <div className="space-y-6">
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {(["txt", "vtt", "srt"] as const).map((format) => (
+                    <motion.div
+                      key={format}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {isCopied ? (
-                        <Check className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <Copy className="h-5 w-5" />
-                      )}
-                    </Button>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-y-auto shadow-inner">
-                    <p className="text-gray-700 leading-relaxed">
-                      {transcribedText}
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-6">
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    {(["txt", "vtt", "srt"] as const).map((format) => (
-                      <motion.div
-                        key={format}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                      <Button
+                        onClick={() => downloadTranscript(format)}
+                        className="bg-blue-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out flex items-center shadow-sm"
                       >
-                        <Button
-                          onClick={() => downloadTranscript(format)}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out flex items-center shadow-sm"
-                        >
-                          <Download className="mr-2 h-4 w-4" />
-                          {format.toUpperCase()}
-                        </Button>
-                      </motion.div>
-                    ))}
-                  </div>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button
-                      onClick={resetApp}
-                      className="w-full text-white font-semibold py-4 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 shadow-md"
-                    >
-                      <RefreshCw className="mr-2 h-5 w-5" />
-                      New Transcription
-                    </Button>
-                  </motion.div>
+                        <Download className="mr-2 h-4 w-4" />
+                        {format.toUpperCase()}
+                      </Button>
+                    </motion.div>
+                  ))}
                 </div>
-              </motion.div>
-            )}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center"
-              >
-                <AlertCircle className="mr-3 h-5 w-5 flex-shrink-0" />
-                <p className="text-sm flex-grow">{error}</p>
-              </motion.div>
-            )}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    onClick={resetApp}
+                    className="w-full text-white font-semibold py-4 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center bg-blue-600 hover:bg-purple-700 shadow-md"
+                  >
+                    <RefreshCw className="mr-2 h-5 w-5" />
+                    New Transcription
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mt-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center shadow-md"
+            >
+              <AlertCircle className="mr-3 h-5 w-5 flex-shrink-0 text-red-500" />
+              <p className="text-sm flex-grow">{error}</p>
+            </motion.div>
+          )}
         </div>
       </main>
     </div>
