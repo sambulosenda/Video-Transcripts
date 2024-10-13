@@ -7,7 +7,6 @@ import {
   Upload,
   Download,
   RefreshCw,
-  Zap,
   Copy,
   Check,
   File,
