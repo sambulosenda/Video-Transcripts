@@ -41,12 +41,14 @@ export default function LandingPage() {
           </span>
         </Link>
         <nav className="hidden md:flex gap-4 sm:gap-6">
-          <Button
-            variant="outline"
-            className="border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            Log in
-          </Button>
+          <Link href="/sign-up" passHref>
+            <Button
+              variant="outline"
+              className="border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              Log in
+            </Button>
+          </Link>
         </nav>
         <div className="flex md:hidden">
           <Button
@@ -62,27 +64,15 @@ export default function LandingPage() {
       {isMenuOpen && (
         <div className="md:hidden bg-white dark:bg-gray-900 p-4">
           <nav className="flex flex-col gap-4">
-            <Link
-              className="text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              href="#features"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Features
+            <Link href="/sign-up" passHref>
+              <Button
+                variant="outline"
+                className="border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Log in
+              </Button>
             </Link>
-            <Link
-              className="text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              href="#pricing"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Pricing
-            </Link>
-            <Button
-              variant="outline"
-              className="border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Log in
-            </Button>
           </nav>
         </div>
       )}
@@ -99,9 +89,11 @@ export default function LandingPage() {
                 businesses, and researchers.
               </p>
               <div className="space-x-4">
-                <Button className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
-                  Start Transcribing
-                </Button>
+                <Link href="/sign-up" passHref>
+                  <Button className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
+                    Start Transcribing
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   className="border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -183,9 +175,11 @@ export default function LandingPage() {
                 and unlock the potential of their audio and video content.
               </p>
               <div className="w-full max-w-sm space-y-2">
-                <Button className="w-full bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
-                  Sign up for free
-                </Button>
+                <Link href="/sign-up" passHref>
+                  <Button className="w-full bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
+                    Sign up for free
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   className="w-full border-black dark:border-white text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -200,116 +194,6 @@ export default function LandingPage() {
 
       <footer className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
         <div className="container px-4 md:px-6 py-8 mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 justify-items-center">
-            <div>
-              <h3 className="font-semibold mb-3">Product</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    API
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-3">Company</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    About us
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-3">Resources</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Help Center
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Community
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-3">Legal</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600  dark:text-gray-300 hover:text-black dark:hover:text-white"
-                  >
-                    Terms of Service
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-gray-600 dark:text-gray-300">
             <p>&copy; 2024 TranscribeAI. All rights reserved.</p>
           </div>
