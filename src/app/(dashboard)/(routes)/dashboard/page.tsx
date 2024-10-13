@@ -138,7 +138,7 @@ export default function DashboardPage() {
     }
   };
 
-  const processFile = async () => {
+ const processFile = async () => {
     if (!file || !FFmpeg || !ffmpegLoaded || !hasActiveTrial) return;
 
     setIsProcessing(true);
@@ -149,14 +149,8 @@ export default function DashboardPage() {
       const ffmpeg = new FFmpeg();
       const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.2/dist/umd";
       await ffmpeg.load({
-        coreURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.js`,
-          "text/javascript"
-        ),
-        wasmURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.wasm`,
-          "application/wasm"
-        ),
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
       });
 
       setProgress(10);
@@ -167,30 +161,9 @@ export default function DashboardPage() {
 
       const isAudio = file.type.startsWith("audio/");
       if (isAudio) {
-        await ffmpeg.exec([
-          "-i",
-          "input",
-          "-acodec",
-          "pcm_s16le",
-          "-ar",
-          "16000",
-          "-ac",
-          "1",
-          "output.wav",
-        ]);
+        await ffmpeg.exec(["-i", "input", "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1", "output.wav"]);
       } else {
-        await ffmpeg.exec([
-          "-i",
-          "input",
-          "-vn",
-          "-acodec",
-          "pcm_s16le",
-          "-ar",
-          "16000",
-          "-ac",
-          "1",
-          "output.wav",
-        ]);
+        await ffmpeg.exec(["-i", "input", "-vn", "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1", "output.wav"]);
       }
 
       setProgress(40);
@@ -208,15 +181,10 @@ export default function DashboardPage() {
 
       setProgress(75);
 
-      const transcribedText = transcriptionResult.text;
-      const segments = transcriptionResult.segments || [];
+      const { text: transcribedText, segments } = transcriptionResult;
 
-      const srtContent = convertToSRT(
-        segments.length > 0 ? segments : transcribedText
-      );
-      const vttContent = convertToVTT(
-        segments.length > 0 ? segments : transcribedText
-      );
+      const srtContent = convertToSRT(segments && segments.length > 0 ? segments : transcribedText);
+      const vttContent = convertToVTT(segments && segments.length > 0 ? segments : transcribedText);
 
       setTranscribedText(transcribedText);
       setTranscripts({
@@ -233,14 +201,13 @@ export default function DashboardPage() {
 
       setProgress(100);
     } catch (err) {
-      console.error(err);
-      setError("An error occurred during processing. Please try again.");
+      console.error("Error in processFile:", err);
+      setError(err instanceof Error ? err.message : "An unexpected error occurred during processing. Please try again.");
     } finally {
       setIsProcessing(false);
     }
   };
-
-  const downloadTranscript = (format: keyof Transcripts) => {
+ const downloadTranscript = (format: keyof Transcripts) => {
     if (!transcripts || !file) return;
 
     const content = transcripts[format];
