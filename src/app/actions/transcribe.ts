@@ -1,5 +1,12 @@
 "use server";
 
+// import { createOpenAI } from "@ai-sdk/openai";
+
+// const groq = createOpenAI({
+//   baseURL: "https://api.groq.com/openai/v1",
+//   apiKey: process.env.GROQ_API_KEY,
+// });
+
 interface TranscriptionResult {
   text: string;
   segments?: Array<{
@@ -18,7 +25,6 @@ export async function transcribe(
       throw new Error("No file provided");
     }
 
-    console.log("Sending transcription request to Groq API");
     const response = await fetch(
       "https://api.groq.com/openai/v1/audio/transcriptions",
       {
@@ -38,24 +44,15 @@ export async function transcribe(
     }
 
     const result = await response.json();
-    console.log("Transcription API response:", JSON.stringify(result, null, 2));
 
-    if (!result || typeof result.text !== "string") {
-      throw new Error(
-        "Unexpected response format: missing or invalid 'text' field"
-      );
+    if (typeof result.text !== "string") {
+      throw new Error("Unexpected response format: missing 'text' field");
     }
 
-    const transcriptionResult: TranscriptionResult = {
+    return {
       text: result.text,
       segments: Array.isArray(result.segments) ? result.segments : undefined,
     };
-
-    console.log(
-      "Processed transcription result:",
-      JSON.stringify(transcriptionResult, null, 2)
-    );
-    return transcriptionResult;
   } catch (error) {
     console.error("Error in transcribe action:", error);
     throw error;
