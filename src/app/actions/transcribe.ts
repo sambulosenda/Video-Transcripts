@@ -45,8 +45,10 @@ export async function transcribe(
 
     const result = await response.json();
 
-    if (typeof result.text !== "string") {
-      throw new Error("Unexpected response format: missing 'text' field");
+    console.log("Transcription API response:", result); // Add this line for debugging
+
+    if (!result || typeof result.text !== "string") {
+      throw new Error("Unexpected response format: missing or invalid 'text' field");
     }
 
     return {
