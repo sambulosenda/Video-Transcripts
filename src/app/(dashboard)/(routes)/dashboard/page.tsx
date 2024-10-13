@@ -16,7 +16,6 @@ import {
 import { transcribe } from "@/app/actions/transcribe";
 import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
-import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,6 +31,7 @@ interface FileSelectionProps {
   fileSize: number;
   onRemove: () => void;
 }
+
 const FileSelection: React.FC<FileSelectionProps> = ({
   fileSize,
   onRemove,
@@ -67,7 +67,6 @@ const FileSelection: React.FC<FileSelectionProps> = ({
 };
 
 export default function DashboardPage() {
-  const { isSignedIn } = useUser();
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -76,8 +75,6 @@ export default function DashboardPage() {
   const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
   const [transcribedText, setTranscribedText] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
-  const [trialUsage, setTrialUsage] = useState(0);
-  const [hasActiveTrial, setHasActiveTrial] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -86,24 +83,6 @@ export default function DashboardPage() {
       setFFmpegLoaded(true);
     });
   }, []);
-
-  useEffect(() => {
-    if (isSignedIn) {
-      checkTrialStatus();
-    }
-  }, [isSignedIn]);
-
-  const checkTrialStatus = async () => {
-    try {
-      const response = await fetch("/api/trial");
-      const data = await response.json();
-      setTrialUsage(data.transcriptsUsed);
-      setHasActiveTrial(data.hasActiveTrial);
-    } catch (error) {
-      console.error("Error checking trial status:", error);
-      setError("Failed to check trial status");
-    }
-  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
@@ -139,7 +118,7 @@ export default function DashboardPage() {
   };
 
   const processFile = async () => {
-    if (!file || !FFmpeg || !ffmpegLoaded || !hasActiveTrial) return;
+    if (!file || !FFmpeg || !ffmpegLoaded) return;
 
     setIsProcessing(true);
     setProgress(0);
@@ -232,12 +211,6 @@ export default function DashboardPage() {
         vtt: vttContent,
       });
 
-      // Update trial usage
-      const trialResponse = await fetch("/api/trial", { method: "PUT" });
-      const trialData = await trialResponse.json();
-      setTrialUsage(trialData.transcriptsUsed);
-      setHasActiveTrial(trialData.hasActiveTrial);
-
       setProgress(100);
     } catch (err) {
       console.error("Error in processFile:", err);
@@ -250,6 +223,7 @@ export default function DashboardPage() {
       setIsProcessing(false);
     }
   };
+
   const downloadTranscript = (format: keyof Transcripts) => {
     if (!transcripts || !file) return;
 
@@ -286,25 +260,6 @@ export default function DashboardPage() {
     }
   };
 
-  if (!hasActiveTrial) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">
-            Trial Expired
-          </h2>
-          <p className="mb-6 text-gray-600">
-            Your trial has expired. Please upgrade to continue using the
-            service.
-          </p>
-          <Button className="bg-blue-600 hover:bg-orange-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300">
-            Upgrade Now
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <main className="flex-1 overflow-y-auto p-6">
@@ -318,14 +273,7 @@ export default function DashboardPage() {
               Professional Plan
             </div>
           </div>
-          {/* Add this line to display trial usage */}
-          {hasActiveTrial ? (
-            <p className="text-sm text-gray-600 mb-4 mf-4">
-              You have {trialUsage} transcripts left
-            </p>
-          ) : null}
 
-          {/* ... rest of the component ... */}
           <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
             {!file ? (
               <motion.div
