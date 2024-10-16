@@ -1,14 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "api.groq.com",
-        port: "",
-        pathname: "/**",
-      },
-    ],
+    unoptimized: true,
   },
   async rewrites() {
     return [
