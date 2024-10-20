@@ -17,6 +17,7 @@ import { transcribe } from "@/app/actions/transcribe";
 import { convertToSRT, convertToVTT } from "@/utils/transcriptionFormats";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { motion } from "framer-motion";
+import { saveAs } from "file-saver";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let FFmpeg: any;
@@ -76,6 +77,11 @@ export default function DashboardPage() {
   const [transcribedText, setTranscribedText] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDownloading, setIsDownloading] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [chunkProgress, setChunkProgress] = useState<number[]>([]);
+  const maxFileSize = 500 * 1024 * 1024; // 500MB
 
   useEffect(() => {
     import("@ffmpeg/ffmpeg").then((FFmpegModule) => {
@@ -87,8 +93,12 @@ export default function DashboardPage() {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
     if (uploadedFile) {
-      if (uploadedFile.size > 25 * 1024 * 1024) {
-        setError("File size exceeds 25MB limit. Please choose a smaller file.");
+      if (uploadedFile.size > maxFileSize) {
+        setError(
+          `File size exceeds ${
+            maxFileSize / (1024 * 1024)
+          }MB limit. Please choose a smaller file.`
+        );
         return;
       }
       setFile(uploadedFile);
@@ -105,8 +115,12 @@ export default function DashboardPage() {
       (droppedFile.type.startsWith("video/") ||
         droppedFile.type.startsWith("audio/"))
     ) {
-      if (droppedFile.size > 25 * 1024 * 1024) {
-        setError("File size exceeds 25MB limit. Please choose a smaller file.");
+      if (droppedFile.size > maxFileSize) {
+        setError(
+          `File size exceeds ${
+            maxFileSize / (1024 * 1024)
+          }MB limit. Please choose a smaller file.`
+        );
         return;
       }
       setFile(droppedFile);
@@ -144,69 +158,90 @@ export default function DashboardPage() {
 
       setProgress(20);
 
-      const isAudio = file.type.startsWith("audio/");
-      if (isAudio) {
+      // Get the duration of the file
+      let durationOutput = "";
+      ffmpeg.on("log", ({ message }: { message: string }) => {
+        durationOutput += message + "\n";
+      });
+
+      await ffmpeg.exec(["-i", "input", "-f", "null", "-"]);
+
+      const durationMatch = durationOutput.match(
+        /Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/
+      );
+      const duration = durationMatch
+        ? parseFloat(durationMatch[1]) * 3600 +
+          parseFloat(durationMatch[2]) * 60 +
+          parseFloat(durationMatch[3])
+        : 0;
+
+      ffmpeg.off("log");
+
+      // Split the file into 10-minute chunks
+      const chunkDuration = 600; // 10 minutes in seconds
+      const numChunks = Math.ceil(duration / chunkDuration);
+      setChunkProgress(new Array(numChunks).fill(0));
+
+      let allTranscribedText = "";
+
+      for (let i = 0; i < numChunks; i++) {
+        const start = i * chunkDuration;
         await ffmpeg.exec([
           "-i",
           "input",
+          "-ss",
+          start.toString(),
+          "-t",
+          chunkDuration.toString(),
           "-acodec",
           "pcm_s16le",
           "-ar",
           "16000",
           "-ac",
           "1",
-          "output.wav",
+          `output_${i}.wav`,
         ]);
-      } else {
-        await ffmpeg.exec([
-          "-i",
-          "input",
-          "-vn",
-          "-acodec",
-          "pcm_s16le",
-          "-ar",
-          "16000",
-          "-ac",
-          "1",
-          "output.wav",
-        ]);
+
+        const audioData = await ffmpeg.readFile(`output_${i}.wav`);
+        const audioBlob = new Blob([audioData], { type: "audio/wav" });
+
+        const formData = new FormData();
+        formData.append("file", audioBlob, "audio.wav");
+        formData.append("model", "whisper-large-v3");
+
+        const transcriptionResult = await transcribe(formData);
+
+        if (!transcriptionResult) {
+          throw new Error(
+            `Transcription failed for chunk ${i}: No result returned`
+          );
+        }
+
+        const { text: chunkText } = transcriptionResult;
+
+        if (typeof chunkText !== "string") {
+          throw new Error(
+            `Transcription failed for chunk ${i}: Invalid text in result`
+          );
+        }
+
+        allTranscribedText += chunkText + " ";
+
+        setChunkProgress((prev) => {
+          const newProgress = [...prev];
+          newProgress[i] = 100;
+          return newProgress;
+        });
+
+        setProgress(20 + Math.round(((i + 1) / numChunks) * 80));
       }
 
-      setProgress(40);
+      const srtContent = convertToSRT(allTranscribedText);
+      const vttContent = convertToVTT(allTranscribedText);
 
-      const audioData = await ffmpeg.readFile("output.wav");
-      const audioBlob = new Blob([audioData], { type: "audio/wav" });
-
-      const formData = new FormData();
-      formData.append("file", audioBlob, "audio.wav");
-      formData.append("model", "whisper-large-v3");
-
-      setProgress(50);
-
-      const transcriptionResult = await transcribe(formData);
-
-      setProgress(75);
-
-      if (!transcriptionResult) {
-        throw new Error("Transcription failed: No result returned");
-      }
-
-      const { text: transcribedText, segments } = transcriptionResult;
-
-      if (typeof transcribedText !== "string") {
-        throw new Error("Transcription failed: Invalid text in result");
-      }
-
-      const srtContent = convertToSRT(
-        segments && segments.length > 0 ? segments : transcribedText
-      );
-      const vttContent = convertToVTT(
-        segments && segments.length > 0 ? segments : transcribedText
-      );
-
-      setTranscribedText(transcribedText);
+      setTranscribedText(allTranscribedText.trim());
       setTranscripts({
-        txt: transcribedText,
+        txt: allTranscribedText.trim(),
         srt: srtContent,
         vtt: vttContent,
       });
@@ -224,21 +259,24 @@ export default function DashboardPage() {
     }
   };
 
-  const downloadTranscript = (format: keyof Transcripts) => {
+  const downloadTranscript = async (format: keyof Transcripts) => {
     if (!transcripts || !file) return;
 
-    const content = transcripts[format];
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    const originalFileName = file.name.split(".").slice(0, -1).join(".");
-    const downloadFileName = `${originalFileName}_transcript.${format}`;
-    a.download = downloadFileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setIsDownloading((prev) => ({ ...prev, [format]: true }));
+
+    try {
+      const content = transcripts[format];
+      const blob = new Blob([content], { type: "text/plain" });
+      const originalFileName = file.name.split(".").slice(0, -1).join(".");
+      const downloadFileName = `${originalFileName}_transcript.${format}`;
+
+      await saveAs(blob, downloadFileName);
+    } catch (error) {
+      console.error("Download failed:", error);
+      // Optionally show an error message to the user
+    } finally {
+      setIsDownloading((prev) => ({ ...prev, [format]: false }));
+    }
   };
 
   const resetApp = () => {
@@ -359,13 +397,21 @@ export default function DashboardPage() {
                     className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-orange-500"
                   ></motion.div>
                 </div>
-                <p className="text-sm text-gray-600 text-center">
-                  {progress < 40
-                    ? "Extracting audio..."
-                    : progress < 75
-                    ? "Transcribing your file..."
+                <div className="grid grid-cols-10 gap-1 mt-2">
+                  {chunkProgress.map((progress, index) => (
+                    <div key={index} className="h-1 bg-gray-200 rounded">
+                      <div
+                        className="h-full bg-green-500 rounded"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 text-center mt-2">
+                  {progress < 20
+                    ? "Preparing audio..."
                     : progress < 100
-                    ? "Generating transcript files..."
+                    ? "Transcribing audio chunks..."
                     : "Transcription complete!"}
                 </p>
               </div>
@@ -413,8 +459,13 @@ export default function DashboardPage() {
                       <Button
                         onClick={() => downloadTranscript(format)}
                         className="bg-white hover:bg-gray-100 text-black font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out flex items-center shadow-sm border border-gray-300"
+                        disabled={isDownloading[format]}
                       >
-                        <Download className="mr-2 h-4 w-4" />
+                        {isDownloading[format] ? (
+                          <RefreshCw className="animate-spin mr-2 h-4 w-4" />
+                        ) : (
+                          <Download className="mr-2 h-4 w-4" />
+                        )}
                         {format.toUpperCase()}
                       </Button>
                     </motion.div>
